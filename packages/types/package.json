@@ -1,0 +1,7 @@
+{
+  "name": "@workspace/types",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./index.ts"
+  }
+}
