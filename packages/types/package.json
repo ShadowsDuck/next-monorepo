@@ -2,7 +2,17 @@
   "name": "@workspace/types",
   "version": "1.0.0",
   "private": true,
+  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w",
+    "lint": "eslint . --max-warnings 0"
+  },
   "exports": {
-    ".": "./index.ts"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
   }
 }
