@@ -62,23 +62,57 @@ Get-ChildItem -Recurse -Force -Filter "._*" | Remove-Item -Force
 
 ```bash
 cd apps
-npx @nestjs/cli new api --package-manager pnpm
+npx @nestjs/cli new backend --package-manager pnpm
 ```
 
 ### แก้ Port ไม่ให้ชนกับ Next.js
 
-เปิด `apps/api/src/main.ts` และเปลี่ยน port เป็น `3001` (หรือเลขอื่นที่ไม่ใช่ 3000)
+เปิด `apps/backend/src/main.ts` และเปลี่ยน port เป็น `3001` (หรือเลขอื่นที่ไม่ใช่ 3000)
 
 ```typescript
 await app.listen(3001)
 ```
 
-### แก้ไข Script `start:dev` เป็น `dev` ใน `apps/api/package.json`
+### แก้ไข Script ใน `apps/backend/package.json`
 
 ```json
 "scripts": {
+  "build": "nest build",
+  "start:dev": "nest start --watch",
+}
+```
+
+เป็น:
+
+```json
+"scripts": {
+  "build": "nest build --webpack",
   "dev": "nest start --watch",
 }
+```
+
+### เพิ่ม `devDependencies` ให้ใช้ typescript-config ใน `apps/backend/package.json`
+
+```json
+"devDependencies": {
+  "@workspace/typescript-config": "workspace:*",
+}
+```
+
+### เพิ่ม `extends` ใน `apps/backend/tsconfig.json`
+
+```json
+"extends": "@workspace/typescript-config/base.json",
+"compilerOptions": {
+  ...
+}
+```
+
+### ติดตั้ง Dependencies
+
+```bash
+# รันที่ Root folder
+pnpm install
 ```
 
 ---
@@ -93,19 +127,34 @@ await app.listen(3001)
 {
   "name": "@workspace/types",
   "version": "1.0.0",
+  "private": true,
   "exports": {
     ".": "./index.ts"
   }
 }
 ```
 
-### 3.2 สร้างไฟล์ Types
+### 3.2 สร้างไฟล์ tsconfig.json
 
-สร้าง `packages/types/src/users.ts`:
+สร้าง `packages/types/tsconfig.json`:
+
+```json
+{
+  "extends": "@workspace/typescript-config/base.json",
+  "compilerOptions": {
+    "strictPropertyInitialization": false
+  },
+  "include": ["."],
+  "exclude": ["node_modules"]
+}
+```
+
+### 3.3 สร้างไฟล์ Types
+
+สร้าง `packages/types/src/users/create-user.request.ts`:
 
 ```typescript
-export interface Users {
-  id: string
+export class CreateUserRequest {
   name: string
   email: string
 }
@@ -114,10 +163,10 @@ export interface Users {
 สร้าง `packages/types/index.ts`:
 
 ```typescript
-export * from "./src/users"
+export * from "./src/users/create-user.request"
 ```
 
-### 3.3 ผูก Package เข้ากับแต่ละ App
+### 3.4 ผูก Package เข้ากับแต่ละ App
 
 **Frontend** — `apps/web/package.json`:
 
@@ -135,7 +184,7 @@ export * from "./src/users"
 }
 ```
 
-### 3.4 ติดตั้ง Dependencies
+### 3.5 ติดตั้ง Dependencies
 
 ```bash
 # รันที่ Root folder
@@ -219,7 +268,7 @@ schema: "prisma",
 
 - `packages/database/.env`
 - `apps/web/.env`
-- `apps/api/.env`
+- `apps/backend/.env`
 
 ```env
 DATABASE_URL="postgresql://postgres:1234@localhost:5432/YOUR_DATABASE_NAME?schema=public"
@@ -263,7 +312,7 @@ export * from "../generated/prisma/client"
 }
 ```
 
-**Backend** — `apps/api/package.json`:
+**Backend** — `apps/backend/package.json`:
 
 ```json
 "dependencies": {
