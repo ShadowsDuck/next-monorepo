@@ -2,7 +2,7 @@ import { prisma } from "@workspace/database"
 import { Button } from "@workspace/ui/components/button"
 
 export default async function Page() {
-  const user = await prisma.user.findMany()
+  const products = await prisma.product.findMany()
 
   return (
     <div className="flex min-h-svh p-6">
@@ -17,14 +17,14 @@ export default async function Page() {
           (Press <kbd>d</kbd> to toggle dark mode)
         </div>
         <div>
-          <h2 className="font-medium">User</h2>
-          {user.map((u) => (
-            <div key={u.id}>
+          <h2 className="font-medium">Products</h2>
+          {products.map((p) => (
+            <div key={p.id}>
               <p>
-                <strong>Name:</strong> {u.name || ""}
+                <strong>Name:</strong> {p.name || ""}
               </p>
               <p>
-                <strong>Email:</strong> {u.email || ""}
+                <strong>Price:</strong> {p.price || ""}
               </p>
             </div>
           ))}
