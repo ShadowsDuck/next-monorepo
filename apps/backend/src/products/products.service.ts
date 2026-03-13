@@ -4,14 +4,14 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async createProduct(createProductRequest: CreateProductRequest) {
-    await this.prisma.product.create({ data: createProductRequest });
+    await this.prismaService.product.create({ data: createProductRequest });
     return createProductRequest;
   }
 
   async getProducts(): Promise<Product[]> {
-    return this.prisma.product.findMany();
+    return this.prismaService.product.findMany();
   }
 }
